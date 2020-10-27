@@ -12,7 +12,6 @@ import menu
 #print(get_time.select_datetime("make pasta"))
 
 #get_site_data.extract_data("03346500", 2019)
-sample_analysis.collect_samples()
 
 #sample_analysis.collect_samples(False)
 '''

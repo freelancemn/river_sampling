@@ -37,6 +37,7 @@ def get_auto_sites(lon_w, lon_e, lat_n, lat_s):
 
   #Go through each horizontal sliver of the bounding box:
   for sliver in range(num_slivers):
+    print(str(sliver) + "/" + str(num_slivers))
     #get the lower and upper latitudes of the sliver
     lat_lower = lat_s + sliver*lat_range
     lat_upper = lat_lower + lat_range
