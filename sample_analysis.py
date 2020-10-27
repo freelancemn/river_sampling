@@ -8,20 +8,25 @@ import matplotlib.pyplot as plt
 import random
 import settings
 
-def populate_model(model_possibilities, samples, iterations):
+def populate_model(site_id, model_possibilities, samples, iterations):
+  file_location = "site_tables/" + str(site_id).split('.')[0] + "/model.csv"
   model_percentiles = []
-  for i in range(iterations):
-    model_set = []
-    for s in range(samples):
-      model_set.append(random.choice(model_possibilities))
-    if i == 0:
-      model_percentiles = percentiles(model_set, settings.grain)
-      #print(model_percentiles)
-    else:
-      new_percentiles = percentiles(model_set, settings.grain)
-      for p in range(len(model_percentiles)):
-        model_percentiles[p] += new_percentiles[p]
-        model_percentiles[p] /= 2
+  #Go through each year of site's history write, data to file
+  with open(file_location, "w+", newline='') as myfile:
+    writer = csv.writer(myfile, delimiter=',')
+    for i in range(iterations):
+      model_set = []
+      for s in range(samples):
+        model_set.append(random.choice(model_possibilities))
+      writer.writerow(model_set)
+      if i == 0:
+        model_percentiles = percentiles(model_set, settings.grain)
+        #print(model_percentiles)
+      else:
+        new_percentiles = percentiles(model_set, settings.grain)
+        for p in range(len(model_percentiles)):
+          model_percentiles[p] += new_percentiles[p]
+          model_percentiles[p] /= 2
   return model_percentiles
 
 def percentiles(set, grain):
@@ -120,7 +125,7 @@ def collect_samples(set_sample_size = True):
       line_count += 1
     
     actual_percentiles = percentiles(actual_set, settings.grain)
-    model_percentiles = populate_model(model_possibilities, samples, iterations)
+    model_percentiles = populate_model(site_id, model_possibilities, samples, iterations)
 
     strategy_code = 0
     if strategy_type == "weekdays and times":
@@ -133,28 +138,11 @@ def collect_samples(set_sample_size = True):
 
     write_site_sheet(site_id, v_name, start_datetime, end_datetime, strategy_code, iterations, samples, potential_count, sample_count, actual_mean, model_mean, actual_percentiles, model_percentiles)
 
-    '''if set_sample_size:
-      counter = 0
-      for p in populate_model(model_possibilities, samples, iterations):
-        model_array.append([])
-        model_array[counter].append(p)
-        #print(model_array)
-        counter += 1
-    else:
-      model_array = [[]] * int(100/settings.grain)
-      for ss in range(len(settings.sample_sizes)):
-        print(len(model_array)+1, "/", len(settings.sample_sizes)+1)
-        pm = populate_model(model_possibilities, settings.sample_sizes[ss], iterations)
-        for p in range(len(pm)):
-          #print(model_array[p])
-          model_array[p].append(pm[p])
-        #print(ss, model_array[ss])
-    
-    #return calculate_error(v_name, actual_percentiles, model_array)'''
+    #return calculate_error(v_name, actual_percentiles, model_array)
 
 def write_site_sheet(site_id, v_name, start_datetime, end_datetime, sampling_strategy, iterations, samples, potential_obs, actual_obs, actual_mean, model_mean, actual_percentiles, model_percentiles):
   #model_run_count = 1
-  file_location = "site_tables/" + str(site_id)
+  file_location = "site_tables/" + str(site_id).split('.')[0] + "/analysis.csv"
   sample_x = [5]
   plt_actual = [actual_percentiles[0]]
   plt_model = [model_percentiles[0]]
