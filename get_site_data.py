@@ -3,6 +3,7 @@ import csv
 import datetime
 import requests
 import settings
+import menu
 
 def get_url(site, year):
   '''Returns url for data of site during specified year'''

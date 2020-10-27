@@ -1,3 +1,4 @@
+import get_auto_sites
 import get_site_data
 from os import listdir
 import menu
@@ -5,13 +6,16 @@ import os
 import settings
 
 def interface():
-  choice = menu.select_element("Site management", ["Add site", "Remove site", "Exit"])
+  options = ["Add site", "Remove site", "Refresh auto site list", "Exit"]
+  choice = menu.select_element("Site management", options)
   while choice != "Exit":
     if choice == "Add site":
       add_site()
     elif choice == "Remove site":
       remove_site()
-    choice = menu.select_element("Site management", ["Add site", "Remove site", "Exit"])
+    elif choice == "Refresh auto site list":
+      get_auto_sites.get_auto_sites(settings.us_w, settings.us_e, settings.us_n, settings.us_s)
+    choice = menu.select_element("Site management", options)
 
 def add_site():
   '''Add a site to site_data if it's in auto_sites.txt'''
