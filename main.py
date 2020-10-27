@@ -1,0 +1,22 @@
+import get_auto_sites
+import get_site_data
+import sample_analysis
+import site_management
+import numpy
+import settings
+import get_time
+
+#print(numpy.percentile([1,12,3,5,31], settings.percentile_grain))
+
+#print(get_time.select_datetime("make pasta"))
+
+#get_site_data.extract_data("03346500", 2019)
+sample_analysis.collect_samples()
+
+#sample_analysis.collect_samples(False)
+'''
+week = get_time.range_week()
+t = get_time.range_time()
+
+print(get_time.time_codify(week, t))
+'''
