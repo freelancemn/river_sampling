@@ -7,27 +7,26 @@ import numpy as np
 import matplotlib.pyplot as plt
 import random
 import settings
+import table_averages
 
 def populate_model(site_id, model_possibilities, samples, iterations):
-  file_location = "site_tables/" + str(site_id).split('.')[0] + "/model.csv"
-  model_percentiles = []
+  model_location = "site_tables/" + str(site_id).split('.')[0] + "/model.csv"
+  percentile_location = "site_tables/" + str(site_id).split('.')[0] + "/percentiles.csv"
+
   #Go through each year of site's history write, data to file
-  with open(file_location, "w+", newline='') as myfile:
-    writer = csv.writer(myfile, delimiter=',')
-    for i in range(iterations):
-      model_set = []
-      for s in range(samples):
-        model_set.append(random.choice(model_possibilities))
-      writer.writerow(model_set)
-      if i == 0:
-        model_percentiles = percentiles(model_set, settings.grain)
-        #print(model_percentiles)
-      else:
-        new_percentiles = percentiles(model_set, settings.grain)
-        for p in range(len(model_percentiles)):
-          model_percentiles[p] += new_percentiles[p]
-          model_percentiles[p] /= 2
-  return model_percentiles
+  with open(model_location, "w+", newline='') as modelfile:
+    model_writer = csv.writer(modelfile, delimiter=',')
+    with open(percentile_location, "w+", newline='') as percentilefile:
+      percentile_writer = csv.writer(percentilefile, delimiter=",")
+      percentile_writer.writerow([x * settings.grain for x in range(1, int(100/settings.grain))]) #write header row of percentile nums
+      for i in range(iterations):
+        model_set = []
+        for s in range(samples):
+          model_set.append(random.choice(model_possibilities))
+        model_writer.writerow(model_set)
+        percentile_writer.writerow(percentiles(model_set, settings.grain))
+  
+  return table_averages.table_averages(percentile_location, iterations)
 
 def percentiles(set, grain):
   '''Finds the percentiles for a set'''
@@ -172,7 +171,7 @@ def write_site_sheet(site_id, v_name, start_datetime, end_datetime, sampling_str
   plt_actual += [actual_percentiles[-1]]
   plt_model += [model_percentiles[-1]]
   print (sample_x)
-  plt.plot(sample_x, plt_actual, label="Actual")
+  plt.errorbar(sample_x, plt_actual, yerr=[abs(a-b) for a, b in zip(plt_model, plt_actual)], label="Actual")
   plt.plot(sample_x, plt_model, label="Model")
   plt.legend(loc="upper right")
   

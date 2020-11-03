@@ -6,13 +6,13 @@ import numpy
 import settings
 import get_time
 import menu
+import table_averages
 
 #print(numpy.percentile([1,12,3,5,31], settings.percentile_grain))
 
 #print(get_time.select_datetime("make pasta"))
 
 #get_site_data.extract_data("03346500", 2019)
-
 #sample_analysis.collect_samples(False)
 '''
 week = get_time.range_week()

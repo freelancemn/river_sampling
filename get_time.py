@@ -89,9 +89,9 @@ def select_datetime(prompt):
   
   #Specify maximum day of month depending on month and leap year
   max_day = 31
-  if month % 2 == 1:
+  if month in [4,6,9,11]:
     max_day = 30
-  if month == 1:
+  if month == 2:
     max_day = 29
     if year % 4 == 0:
       max_day = 28
