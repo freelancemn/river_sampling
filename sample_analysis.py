@@ -7,9 +7,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 import random
 import settings
-import table_averages
+import table_math
 
-def populate_model(site_id, model_possibilities, samples, iterations):
+def populate_model(site_id, model_possibilities, samples, iterations, actual):
   model_location = "site_tables/" + str(site_id).split('.')[0] + "/model.csv"
   percentile_location = "site_tables/" + str(site_id).split('.')[0] + "/percentiles.csv"
 
@@ -18,15 +18,16 @@ def populate_model(site_id, model_possibilities, samples, iterations):
     model_writer = csv.writer(modelfile, delimiter=',')
     with open(percentile_location, "w+", newline='') as percentilefile:
       percentile_writer = csv.writer(percentilefile, delimiter=",")
-      percentile_writer.writerow([x * settings.grain for x in range(1, int(100/settings.grain))]) #write header row of percentile nums
-      for i in range(iterations):
+      percentile_writer.writerow([x * settings.grain for x in range(1, int(100/settings.grain))] + ["avg"]) #write header row of percentile nums
+      for _ in range(iterations):
         model_set = []
-        for s in range(samples):
+        for _ in range(samples):
           model_set.append(random.choice(model_possibilities))
         model_writer.writerow(model_set)
-        percentile_writer.writerow(percentiles(model_set, settings.grain))
+        p = percentiles(model_set, settings.grain)
+        percentile_writer.writerow(p + [np.average(p)])
   
-  return table_averages.table_averages(percentile_location, iterations)
+  return (table_math.table_averages(percentile_location, iterations), table_math.table_sd(percentile_location, actual))
 
 def percentiles(set, grain):
   '''Finds the percentiles for a set'''
@@ -124,7 +125,10 @@ def collect_samples(set_sample_size = True):
       line_count += 1
     
     actual_percentiles = percentiles(actual_set, settings.grain)
-    model_percentiles = populate_model(site_id, model_possibilities, samples, iterations)
+    actual_percentiles += [np.average(actual_percentiles)]
+    model_stats = populate_model(site_id, model_possibilities, samples, iterations, actual_percentiles)
+    print(model_stats[0])
+    print(model_stats[1])
 
     strategy_code = 0
     if strategy_type == "weekdays and times":
@@ -135,7 +139,7 @@ def collect_samples(set_sample_size = True):
     actual_mean = sum(actual_set)/len(actual_set)
     model_mean = sum(model_possibilities)/len(model_possibilities)
 
-    write_site_sheet(site_id, v_name, start_datetime, end_datetime, strategy_code, iterations, samples, potential_count, sample_count, actual_mean, model_mean, actual_percentiles, model_percentiles)
+    write_site_sheet(site_id, v_name, start_datetime, end_datetime, strategy_code, iterations, samples, potential_count, sample_count, actual_mean, model_mean, actual_percentiles[:-1], model_stats[0][:-1])
 
     #return calculate_error(v_name, actual_percentiles, model_array)
 

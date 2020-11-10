@@ -6,7 +6,7 @@ import numpy
 import settings
 import get_time
 import menu
-import table_averages
+import table_math
 
 #print(numpy.percentile([1,12,3,5,31], settings.percentile_grain))
 
