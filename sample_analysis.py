@@ -56,14 +56,14 @@ def flow_percentile(file_location, start_datetime, end_datetime, grain, percenti
           break
   return (flow_column, percentiles(flow_rates, grain)[percentile])
 
-def collect_samples(set_sample_size = True):
+def collect_samples(set_sample_size = True, delim = ","):
   '''Conduct sampling analysis'''
   site = menu.select_element("site", listdir("site_data"))
   file_location = "site_data/" + site
 
   with open(file_location, "r") as csvfile:
     site_id = file_location.split("/")[1]
-    csv_reader = csv.reader(csvfile, delimiter=',')
+    csv_reader = csv.reader(csvfile, delimiter = delim)
     line_count = 0
     sample_count = 0
     potential_count = 0
@@ -96,6 +96,7 @@ def collect_samples(set_sample_size = True):
 
     for row in csv_reader:
       if line_count == 0: #Select parameters using header info
+        print('here"s a row', row)
         variable = menu.select_element("variable", row[1:], True)
         v_name = row[variable]
         if strategy_type == "weekdays and times":
@@ -127,8 +128,8 @@ def collect_samples(set_sample_size = True):
     actual_percentiles = percentiles(actual_set, settings.grain)
     actual_percentiles += [np.average(actual_percentiles)]
     model_stats = populate_model(site_id, model_possibilities, samples, iterations, actual_percentiles)
-    print(model_stats[0])
-    print(model_stats[1])
+    print("absolute SD\n", model_stats[1][0])
+    print("percent SD\n", model_stats[1][1])
 
     strategy_code = 0
     if strategy_type == "weekdays and times":
@@ -139,7 +140,10 @@ def collect_samples(set_sample_size = True):
     actual_mean = sum(actual_set)/len(actual_set)
     model_mean = sum(model_possibilities)/len(model_possibilities)
 
-    write_site_sheet(site_id, v_name, start_datetime, end_datetime, strategy_code, iterations, samples, potential_count, sample_count, actual_mean, model_mean, actual_percentiles[:-1], model_stats[0][:-1])
+    print(samples, "samples")
+    print([a - b for a, b in zip(actual_percentiles, model_stats[0])])
+
+    #write_site_sheet(site_id, v_name, start_datetime, end_datetime, strategy_code, iterations, samples, potential_count, sample_count, actual_mean, model_mean, actual_percentiles[:-1], model_stats[0][:-1])
 
     #return calculate_error(v_name, actual_percentiles, model_array)
 

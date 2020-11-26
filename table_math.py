@@ -19,17 +19,23 @@ def table_averages(file, total_lines):
 def table_sd(file, actual):
     with open(file, "r") as myfile:
         csv_reader = csv.reader(myfile, delimiter=',')
-        sd_list = []
-        flipped_table = [[] for _ in range(len(actual))]
+        sd_list_abs = []
+        sd_list_per = []
+        flipped_table_abs = [[] for _ in range(len(actual))]
+        flipped_table_per = [[] for _ in range(len(actual))]
 
         header = True
         for line in csv_reader:
             if header != True:
                 for col in range(len(actual)):                
-                    flipped_table[col].append(float(line[col]) - actual[col])
+                    flipped_table_abs[col].append(float(line[col]) - actual[col])
+                    flipped_table_per[col].append(100/actual[col]*(float(line[col]) - actual[col]))
             header = False
     
-    for row in flipped_table:
-        sd_list.append(np.std(row))
+    for row in flipped_table_abs:
+        sd_list_abs.append(np.std(row))
         
-    return sd_list
+    for row in flipped_table_per:
+        sd_list_per.append(np.std(row))
+
+    return [sd_list_abs,sd_list_per]
