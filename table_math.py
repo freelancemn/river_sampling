@@ -1,6 +1,8 @@
 import csv
 import numpy as np
 
+#   CHANGE THESE TO JUST WORK ON LISTS OF SAMPLES
+
 def table_averages(file, total_lines):
     with open(file, "r") as myfile:
         csv_reader = csv.reader(myfile, delimiter=',')
