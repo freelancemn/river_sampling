@@ -9,137 +9,86 @@ import random
 import settings
 import table_math
 
+class Data:
+  def __init__(self, values, calc_sd = False, calc_perc = True, calc_mean = True):
+    self.mean = 0
+    self.percentiles = []
+    self.sd = 0
+
+    if calc_sd == True:
+      self.sd = np.std(values)
+    if calc_mean == True:
+      self.mean = sum(values)/len(values)
+    if calc_perc == True:
+      self.percentiles = np.percentile(values, settings.p_vals)
+
+class Line:
+  def __init__(self, model, absolute_err, relative_err):
+    self.model = model
+    self.absolute_err = absolute_err
+    self.relative_err = relative_err
+
+class Model:
+  def __init__(self, samples, subsample_num, iterations, parameter):
+    self.samples = samples
+    self.subsample_num = subsample_num
+    self.iterations = iterations
+    self.parameter = parameter
+    self.lines = []
+
+  def cull(self):
+    pass
+
+  def clean(self):
+    s = []
+    print(self.samples)
+    for sample in self.samples:
+      print(sample)
+      s.append(sample[self.parameter])
+    self.samples = s
+  
+  def subset(self):
+    s = []
+    for _ in range(self.subsample_num):
+      s.append(random.choice(self.samples))
+    return Data(s)
+
+  def data_of_matrix(self, matrix):
+    data_at_p = []
+    for p in range(len(settings.p_vals)):
+      pv = []
+      for d in matrix:
+        pv.append(d.percentiles[p])
+      data_at_p.append(Data(pv, calc_sd=True, calc_perc=False))
+    return data_at_p
+
+  def iterate(self):
+    self.cull()
+    self.clean()
+    actual = Data(self.samples, calc_sd=True)
+    model = []
+    absolute_diffs = []
+    relative_diffs = []
+
+    for _ in range(self.iterations):
+      sub = self.subset()
+      model.append(sub)
+      absolute_diffs.append(Data([a - m for a, m in zip(actual.percentiles, sub.percentiles)]))
+      relative_diffs.append(Data([100/m * (a - m) for a, m in zip(actual.percentiles, sub.percentiles)]))
+
+    self.lines.append(Line(self.data_of_matrix(model), self.data_of_matrix(absolute_diffs), self.data_of_matrix(relative_diffs)))
+
+class Analysis:
+  def __init__(self, site, iterations=0, subsamples=0, time_range=0, parameter=0):
+    self.iterations = menu.select_integer("Number of iterations")
+    self.subsamples = menu.select_integer("Number of subsamples")
+    self.time_range = time_range
+    self.parameter = parameter
 
 #   REFER TO PAUL'S EMAIL
 
-
-def percentiles(ls, grain):
-  '''Finds every (100/grain)th percentile for a list'''
-  p = []
-  for x in range(1, int(100/grain)):
-    p.append(np.percentile(ls, x*grain))
-  return p
-
 #a sample is a dictionary where the keys are the column titles and the values are the vals
-
-class Model:
-  def __init__(self):
-    self.samples = []
-
-  def populate_model(self, samples):
-    self.samples = samples
-
-  def mean(self):
-    return sum(self.samples)/len(self.samples)
-
-class DT_Model(Model):
-  def __init__(self, days, times, iterations, samples):
-    super().__init__()
-    self.iterations = iterations
-    self.samples = samples
-    self.days = days
-    self.times = times
-
-  def in_time(self):
-
-
-  def populate_model(self, samples):
-
-    get_time.in_range(dt, weekdays, time_range)
-
-  #requires particular "populate" method, no need to redefine cull
-
-class Flow_Model(Model):
-  def __init__(self, below_flow_percentile):
-    super().__init__()
-    self.below_flow_percentile = below_flow_percentile
-
-  def flow_at_percentile(self):
-    flows = [s["Streamflow, ft&#179;/s"] for s in self.samples]
-    return np.percentile(flows, self.below_flow_percentile)
-
-  def populate_model(self, samples):
-    culled = []
-    f_p = flow_at_percentile(flow_percentile)
-
-    for s in samples:
-      if s["Streamflow, ft&#179;/s"] <= f_p:
-        culled.append(s)
-
-    self.samples = culled
-
-
-class Variable:
-  def __init__(self, variable, file, start_dt, end_dt, strategy_type):
-    self.file = file
-    self.start_dt = start_dt
-    self.end_dt = end_dt
-    self.strategy_type = strategy_type
-    self.actual = Model()
-    self.modeled = Model()
-
-class Analysis:
-  def __init__(self):
-    self.site = menu.select_element("site", listdir("site_data"))
-    self.file_location = "site_data/" + self.site
-
-    strategies = ["weekdays and times", "flow rate"]
-    self.strategy_type = menu.select_element("strategy", strategies)
-
-    self.start_datetime = get_time.select_datetime("Selecting start date/time")
-    self.end_datetime = get_time.select_datetime("Selecting end date/time")
-    #while end_datetime < start_datetime:
-    #  print("Select an end date/time that's greater than " + str(start_datetime))
-
-  def populate_models(self):
-    with open(self.file, "r") as csvfile:
-    site_id = file_location.split("/")[1]
-    csv_reader = csv.reader(csvfile, delimiter = delim)
-    line_count = 0
-    #these two variables keep track of how many samples were valid
-    sample_count = 0
-    potential_count = 0
-      
-    weekdays = []
-    time_range = []
-    samples = 0
-    iterations = 0
-    actual_set = []
-    model_possibilities = []
-
-    for row in csv_reader:
-      if line_count == 0: #Select parameters using header info
-        print('here"s a row', row)
-        variable = menu.select_element("variable", row[1:], True)
-        v_name = row[variable]
-        if strategy_type == "weekdays and times":
-          weekdays = get_time.range_week()
-          time_range = get_time.range_time()
-        if set_sample_size:
-          samples = menu.select_integer("number of samples")
-        iterations = menu.select_integer("number of iterations")
-      else:
-        dt = datetime.datetime.fromisoformat(row[0])
-        if dt > end_datetime:
-          break
-        if dt >= start_datetime:
-          potential_count += 1
-          if row[variable] != '':
-            sample_count += 1
-            #Populate actual sampleset
-            val = float(row[variable])
-            actual_set.append(val)
-            #Add time to distribution model if it meets requirements
-            if strategy_type == "weekdays and times" and get_time.in_range(dt, weekdays, time_range):
-              model_possibilities.append(val)
-            elif strategy_type == "flow rate" and row[flow_column] !='':
-              if float(row[flow_column]) < flow_p:
-                model_possibilities.append(val)
-                below_flow += 1
-      line_count += 1
-
-  
-
+'''
 
 def populate_model(site_id, model_possibilities, samples, iterations, actual):
   model_location = "site_tables/" + str(site_id).split('.')[0] + "/model.csv"
@@ -182,7 +131,7 @@ def flow_percentile(file_location, start_datetime, end_datetime, grain, percenti
   return (flow_column, percentiles(flow_rates, grain)[percentile])
 
 def collect_samples(set_sample_size = True, delim = ","):
-  '''Conduct sampling analysis'''
+  ''Conduct sampling analysis'
   #site = menu.select_element("site", listdir("site_data"))
   #file_location = "site_data/" + site
 
@@ -271,7 +220,7 @@ def collect_samples(set_sample_size = True, delim = ","):
     #write_site_sheet(site_id, v_name, start_datetime, end_datetime, strategy_code, iterations, samples, potential_count, sample_count, actual_mean, model_mean, actual_percentiles[:-1], model_stats[0][:-1])
 
     #return calculate_error(v_name, actual_percentiles, model_array)
-'''
+
 def write_site_sheet(site_id, v_name, start_datetime, end_datetime, sampling_strategy, iterations, samples, potential_obs, actual_obs, actual_mean, model_mean, actual_percentiles, model_percentiles):
   #model_run_count = 1
   file_location = "site_tables/" + str(site_id).split('.')[0] + "/analysis.csv"

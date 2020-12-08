@@ -21,12 +21,16 @@ t = get_time.range_time()
 print(get_time.time_codify(week, t))
 '''
 
-main_menu_options = ["Analyze site", "Site management", "Quit"]
-main_menu = menu.select_element("Main menu", main_menu_options)
-
+#main_menu_options = ["Analyze site", "Site management", "Quit"]
+#main_menu = menu.select_element("Main menu", main_menu_options)
+t = sample_analysis.Model([[1,2],[2,3],[3,4]], 5, 5, 1)
+t.iterate()
+#print([d.mean for d in t.relative_errors])
+'''
 while main_menu != "Quit":
     if main_menu == "Analyze site":
-        sample_analysis.collect_samples()
+        #sample_analysis.collect_samples()
+        print("workin' on it")
     elif main_menu == "Site management":
         site_management.interface()
-    main_menu = menu.select_element("Main menu", main_menu_options)
+    main_menu = menu.select_element("Main menu", main_menu_options)'''
