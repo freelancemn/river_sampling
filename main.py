@@ -23,8 +23,8 @@ print(get_time.time_codify(week, t))
 
 #main_menu_options = ["Analyze site", "Site management", "Quit"]
 #main_menu = menu.select_element("Main menu", main_menu_options)
-t = sample_analysis.Model([[1,2],[2,3],[3,4]], 5, 5, 1)
-t.iterate()
+t = sample_analysis.Model(numpy.random.normal(size=(100000,5)), 1000, 1)
+t.generate_maap()
 #print([d.mean for d in t.relative_errors])
 '''
 while main_menu != "Quit":

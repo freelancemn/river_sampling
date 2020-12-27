@@ -8,7 +8,14 @@ import matplotlib.pyplot as plt
 import random
 import settings
 import table_math
-
+def data_of_matrix(matrix):
+    data_at_p = []
+    for p in range(len(matrix[0].percentiles)):
+      pv = []
+      for d in matrix:
+        pv.append(d.percentiles[p])
+      data_at_p.append(Data(pv, calc_sd=True, calc_perc=False))
+    return data_at_p
 class Data:
   def __init__(self, values, calc_sd = False, calc_perc = True, calc_mean = True):
     self.mean = 0
@@ -23,33 +30,37 @@ class Data:
       self.percentiles = np.percentile(values, settings.p_vals)
 
 class Line:
-  def __init__(self, model, absolute_err, relative_err):
-    self.model = model
+  def __init__(self, absolute_err, relative_err):
+    #self.model = model
     self.absolute_err = absolute_err
     self.relative_err = relative_err
 
 class Model:
-  def __init__(self, samples, subsample_num, iterations, parameter):
+  def __init__(self, samples, iterations, parameter):
     self.samples = samples
-    self.subsample_num = subsample_num
+    self.sample_size = 0
     self.iterations = iterations
-    self.parameter = parameter
+    self.parameter = parameter  #make this a list
     self.lines = []
 
   def cull(self):
     pass
 
+  def cull_missing(self):
+    #generate the actual values before doing this 
+    #get rid of the lines that have missing data for the parameters we're observing
+    #allow user to set threshold % of how much missing is acceptable
+    pass
+
   def clean(self):
     s = []
-    print(self.samples)
     for sample in self.samples:
-      print(sample)
       s.append(sample[self.parameter])
     self.samples = s
   
   def subset(self):
     s = []
-    for _ in range(self.subsample_num):
+    for _ in range(self.sample_size):
       s.append(random.choice(self.samples))
     return Data(s)
 
@@ -62,26 +73,57 @@ class Model:
       data_at_p.append(Data(pv, calc_sd=True, calc_perc=False))
     return data_at_p
 
-  def iterate(self):
-    self.cull()
-    self.clean()
-    actual = Data(self.samples, calc_sd=True)
-    model = []
+  def iterate(self, actual):
+    #model = []
     absolute_diffs = []
     relative_diffs = []
 
     for _ in range(self.iterations):
       sub = self.subset()
-      model.append(sub)
+      #model.append(sub)
       absolute_diffs.append(Data([a - m for a, m in zip(actual.percentiles, sub.percentiles)]))
-      relative_diffs.append(Data([100/m * (a - m) for a, m in zip(actual.percentiles, sub.percentiles)]))
+      relative_diffs.append(Data([100/a * (a - m) for a, m in zip(actual.percentiles, sub.percentiles)]))
 
-    self.lines.append(Line(self.data_of_matrix(model), self.data_of_matrix(absolute_diffs), self.data_of_matrix(relative_diffs)))
+    #self.lines.append(Line(self.data_of_matrix(model), self.data_of_matrix(absolute_diffs), self.data_of_matrix(relative_diffs)))
+    self.lines.append(Line(self.data_of_matrix(absolute_diffs), self.data_of_matrix(relative_diffs)))
+
+  def generate_maap(self):
+    #change this so it looks at the list of parameters
+    original = self.samples
+    self.clean()
+    actual = Data(self.samples, calc_sd=True)
+
+    self.samples = original
+    self.cull()
+    self.clean()
+
+    for sn in settings.sample_sizes:
+      self.sample_size = sn
+      self.iterate(actual)
+      
+    #try to put things into a table format before generating the graph
+    line_ls = [[] for _ in range(len(settings.p_vals))]
+    abs_ls = [[] for _ in range(len(settings.p_vals))]
+    rel_ls = [[] for _ in range(len(settings.p_vals))]
+
+    for l in self.lines:
+      for p in range(len(settings.p_vals)):
+          line_ls[p].append(l.absolute_err[p].mean)
+          abs_ls[p].append(l.absolute_err[p].sd)
+          rel_ls[p].append(l.relative_err[p].sd)
+
+    for l in range(len(line_ls))[::3]:
+      plt.errorbar(settings.sample_sizes, line_ls[l], yerr=abs_ls[l])
+
+    plt.show()
+    
 
 class Analysis:
   def __init__(self, site, iterations=0, subsamples=0, time_range=0, parameter=0):
-    self.iterations = menu.select_integer("Number of iterations")
-    self.subsamples = menu.select_integer("Number of subsamples")
+    if iterations == 0:
+      self.iterations = menu.select_integer("Number of iterations")
+    if subsamples == 0:
+      self.subsamples = menu.select_integer("Number of subsamples")
     self.time_range = time_range
     self.parameter = parameter
 
