@@ -35,5 +35,4 @@ def remove_site():
     return
   
   file_location = "site_data/" + site
-
   os.remove(file_location)
