@@ -8,6 +8,10 @@ import matplotlib.pyplot as plt
 import random
 import settings
 
+def flatten(l):
+  flat_list = [item for sublist in l for item in sublist]
+  return flat_list
+
 class Data:
   def __init__(self, values, calc_sd = False, calc_perc = True, calc_mean = True):
     self.mean = 0
@@ -114,30 +118,31 @@ class Model:
           abs_ls[p].append(l.absolute_err[p].sd)
           rel_ls[p].append(l.relative_err[p].sd)
 
-    '''for l in range(len(line_ls))[::3]:
+    for l in range(len(line_ls)):#[::3]:
       plt.errorbar(settings.sample_sizes, line_ls[l], yerr=abs_ls[l])
 
-    plt.show()'''
+    plt.suptitle("hello!")
+    plt.show()
 
     head = [self.potential_observations, self.actual_observations, actual.mean, self.model_mean/self.actual_observations, num_culled]
-    return head + line_ls + abs_ls + rel_ls
+    return head + flatten(line_ls) + flatten(abs_ls) + flatten(rel_ls)
 
 def data_in_time_range(file_location, time_range):
   with open(file_location, 'r') as csvfile: 
     csvreader = csv.reader(csvfile) 
     data = []
-    data += next(csvreader)
+    data.append(next(csvreader))
 
     for row in csvreader: 
       dt = datetime.datetime.fromisoformat(row[0])
-      if dt > time_range[0]:
+      if dt > time_range[1]:
         break
       elif dt < time_range[1]:
-        data += row
+        data.append(row)
   
     return data 
 
-def analyze(site, iterations=0, time_range=0):
+def analyze(iterations=0, time_range=0):
   site = menu.select_element("site", listdir("site_data") + ["Exit"])
   if site == "Exit":
     return
@@ -155,7 +160,7 @@ def analyze(site, iterations=0, time_range=0):
 
   data = data_in_time_range("site_data/"+site, time_range)
 
-  with open("summary.csv", "a") as csvfile:
+  with open("summary.csv", "a", newline='') as csvfile:
     writer = csv.writer(csvfile) 
 
     for p in range(1, len(data[0])):

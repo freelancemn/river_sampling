@@ -29,8 +29,7 @@ main_menu = menu.select_element("Main menu", main_menu_options)
 
 while main_menu != "Quit":
     if main_menu == "Analyze site":
-        #sample_analysis.collect_samples()
-        print("workin' on it")
+        sample_analysis.analyze()
     elif main_menu == "Site management":
         site_management.interface()
     main_menu = menu.select_element("Main menu", main_menu_options)
