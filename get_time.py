@@ -101,7 +101,7 @@ def select_datetime(prompt):
   max_minute = 4
   if year == now.year and month == now.month:
     max_day = now.day
-    max_hour = now.hour
+    max_hour = now.hour #fix thi slaterffff
     max_minute = now.minute // 15 + 1
   day = menu.select_integer("Day", 1, max_day)
   hour = menu.select_integer("Hour", 0, max_hour)
