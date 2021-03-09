@@ -170,6 +170,9 @@ def data_in_time_range(file_location, time_range):
   
     return data 
 
+def transpose(m):
+  return [[m[j][i] for j in range(len(m))] for i in range(len(m[0]))]
+
 def analyze(iterations=0, time_range=0):
   '''run the generate_maap function for each parameter in a site's data'''
   
@@ -202,9 +205,15 @@ def analyze(iterations=0, time_range=0):
       dt_info = [time_range[0].date(), time_range[0].time(), time_range[1].date(), time_range[1].time()]#, (time_range[1].date()-time_range[0].date()).days]
       head = [p, site.split(".")[0], data[0][p]] + dt_info
 
+      val_ls_t = transpose(m.val_ls)
+      abs_ls_t = transpose(m.abs_ls)
+      rel_ls_t = transpose(m.rel_ls)
+      abs_sd_t = transpose(m.abs_sd)
+      rel_sd_t = transpose(m.rel_sd)
+      
       for s in range(len(settings.sample_sizes)):
-        head += ["INSERT SAMPLING STRATEGY", iterations, settings.sample_sizes[s], "perc culled", np.mean(m.val_m), np.sd(m.val_m)]
-        writer.writerow(head + m.val_ls[s] + [np.mean(m.abs_m), np.sd(m.abs_m)] + m.abs_ls[s] + [np.mean(m.rel_m), np.sd(m.rel_m)] + m.rel_ls[s] + m.abs_sd[s] + m.rel_sd[s])
+        head_e = head + ["INSERT SAMPLING STRATEGY", iterations, settings.sample_sizes[s], "perc culled", np.mean(m.val_m), np.std(m.val_m)]
+        writer.writerow(head_e + val_ls_t[s] + [np.mean(m.abs_m), np.std(m.abs_m)] + abs_ls_t[s] + [np.mean(m.rel_m), np.std(m.rel_m)] + rel_ls_t[s] + abs_sd_t[s] + rel_sd_t[s])
 
       with open("site_summaries.csv", "a", newline='') as f:
         w = csv.writer(f)
