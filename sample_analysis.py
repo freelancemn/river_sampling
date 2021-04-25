@@ -6,6 +6,7 @@ import menu
 import numpy as np
 import matplotlib.pyplot as plt
 import random
+#from scipy.stats import skewnorm
 import settings
 
 def flatten(l):
@@ -46,13 +47,13 @@ class Model:
     self.potential_observations = 0
     self.actual_observations = 0
     self.model_mean = 0
-    self.actual = 0
-    self.val_ls = [[] for _ in range(len(settings.p_vals))]
+    self.actual = 0     #will be a data value that holds the actual data
+    self.val_ls = [[] for _ in range(len(settings.p_vals))]   #holds lines for each percentile
     self.abs_ls = [[] for _ in range(len(settings.p_vals))]
     self.rel_ls = [[] for _ in range(len(settings.p_vals))]
     self.abs_sd = [[] for _ in range(len(settings.p_vals))]
     self.rel_sd = [[] for _ in range(len(settings.p_vals))]
-    self.val_m = []
+    self.val_m = []   #means
     self.abs_m = []
     self.rel_m = []
 
@@ -64,10 +65,10 @@ class Model:
     '''get rid of samples that don't have a value in the parameter index'''
     s = []
     for sample in self.samples:
-      if sample[self.parameter] != "":
+      if sample[self.parameter] != "":          #if there's something in the field
         val = float(sample[self.parameter])
         s.append(val)
-        #keep track of how many potential observations are being used
+        #keep track of how many potential vs actual observations are being used
         self.actual_observations += 1
         self.model_mean += val
       self.potential_observations += 1
@@ -77,14 +78,15 @@ class Model:
     '''take sample_size amounts of random samples from the culled sample space and return them as a Data object'''
     s = []
     for _ in range(self.sample_size):
-      s.append(random.choice(self.samples))
-    return Data(s)
+      s.append(float(random.choice(self.samples)[self.parameter]))
+    d = Data(s)
+    return d
 
-  def data_of_matrix_cols(self, matrix):
-    '''return Data objects composed of the transpose of a given matrix'''
+  def data_of_transposed_percentiles(self, matrix):
+    '''return Data objects composed of the transpose of a given matrix's percentiles'''
     data_at_p = []
     for p in range(len(settings.p_vals)):
-      pv = []
+      pv = []         #percentile values
       for d in matrix:
         pv.append(d.percentiles[p])
       data_at_p.append(Data(pv, calc_sd=True, calc_perc=False))
@@ -98,7 +100,7 @@ class Model:
     return np.mean(means)
 
   def iterate(self, actual):
-    '''calculate abs and rel diffs between rand subset of culled samples and original dataset iterations times for given sample size'''
+    '''calculate abs and rel diffs between rand subset of culled samples and original dataset, iterations times, for given sample size'''
     absolute_diffs = []
     relative_diffs = []
     model_vals = []
@@ -106,7 +108,7 @@ class Model:
     for _ in range(self.iterations):
       sub = self.subset()
       model_vals.append(sub)
-      absolute_diffs.append(Data([a - m for a, m in zip(actual.percentiles, sub.percentiles)]))
+      absolute_diffs.append(Data([a - m for a, m in zip(actual.percentiles, sub.percentiles)])) #diffs between subset percentiles and actual percentiles
       relative_diffs.append(Data([100/a * (a - m) for a, m in zip(actual.percentiles, sub.percentiles)]))
 
     self.val_m = self.mean_of_data_matrix(model_vals)
@@ -114,7 +116,7 @@ class Model:
     self.rel_m = self.mean_of_data_matrix(relative_diffs)
 
     #generate Data objects for each percentile of the abs and rel diffs
-    self.verts.append(Vert(self.data_of_matrix_cols(model_vals), self.data_of_matrix_cols(absolute_diffs), self.data_of_matrix_cols(relative_diffs)))
+    self.verts.append(Vert(self.data_of_transposed_percentiles(model_vals), self.data_of_transposed_percentiles(absolute_diffs), self.data_of_transposed_percentiles(relative_diffs)))
 
   def generate_maap(self):
     '''run the iterate function for each sample size in settings.py'''
@@ -128,7 +130,7 @@ class Model:
     num_culled = len(self.samples)
     self.cull()
     num_culled -= len(self.samples)
-    self.clean()
+    #self.clean()
 
     #commence the iterating
     for sn in settings.sample_sizes:
@@ -144,11 +146,11 @@ class Model:
           self.abs_sd[p].append(round(v.absolute_err[p].sd, 4))
           self.rel_sd[p].append(round(v.relative_err[p].sd, 4))
 
-    '''for l in range(len(val_ls)):
-      plt.errorbar(settings.sample_sizes, val_ls[l], yerr=abs_ls[l])
+    for l in range(len(self.val_ls)):
+      plt.errorbar(settings.sample_sizes, self.val_ls[l], yerr=self.abs_ls[l])
 
     plt.suptitle("hello!")
-    plt.show()'''
+    plt.show()
 
     #head = ["subsamples", num_culled, self.actual.mean]
     #return head + flatten(val_ls) + flatten(abs_ls) + flatten(rel_ls)
@@ -163,7 +165,7 @@ def data_in_time_range(file_location, time_range):
     #the datetime info is in the first column
     for row in csvreader: 
       dt = datetime.datetime.fromisoformat(row[0])
-      if dt > time_range[1]:
+      if dt > time_range[1]:    #only use data within the timerange
         break
       elif dt < time_range[1]:
         data.append(row)
@@ -171,12 +173,13 @@ def data_in_time_range(file_location, time_range):
     return data 
 
 def transpose(m):
+  '''returns transpose of 2d list'''
   return [[m[j][i] for j in range(len(m))] for i in range(len(m[0]))]
 
 def analyze(iterations=0, time_range=0):
   '''run the generate_maap function for each parameter in a site's data'''
   
-  #allow the user to select the site, number of iterations, and tmie_range
+  #allow the user to select the site, number of iterations, and time_range
   site = menu.select_element("site", listdir("site_data") + ["Exit"])
   if site == "Exit":
     return

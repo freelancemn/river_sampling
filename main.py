@@ -6,6 +6,7 @@ import numpy
 import settings
 import get_time
 import menu
+from scipy.stats import skewnorm
 
 #print(numpy.percentile([1,12,3,5,31], settings.percentile_grain))
 
@@ -22,11 +23,15 @@ print(get_time.time_codify(week, t))
 
 main_menu_options = ["Analyze site", "Site management", "Quit"]
 main_menu = menu.select_element("Main menu", main_menu_options)
-
-#t = sample_analysis.Model(numpy.random.normal(size=(100000,5)), 1000, 1)
-#t.generate_maap()
+'''
+s = 100000
+a = -100
+#d = numpy.random.normal(size=(s,5))
+d = skewnorm.rvs(a, size=(s,5))
+t = sample_analysis.Model(d, 1000, 1)
+t.generate_maap()
 #print([d.mean for d in t.relative_errors])
-
+'''
 while main_menu != "Quit":
     if main_menu == "Analyze site":
         sample_analysis.analyze()
