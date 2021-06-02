@@ -78,14 +78,18 @@ def select_datetime(prompt):
   '''Ask user to select date between settings.earliest year and now'''
   print(prompt)
   now = datetime.now()
-  months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+  months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December", "Start of year"]
   
   #If current year is chosen, make maximum month the current month
   year = menu.select_integer("Year", settings.earliest_year, now.year)
   max_month = 12
   if year == now.year:
     max_month = now.month
-  month = menu.select_element("Month", months[0:max_month], True)
+  month = menu.select_element("Month", months, True)
+  
+  if (month > max_month):
+    tz = get_localzone()
+    return tz.localize(datetime(year, 1, 1, 0, 0))
   
   #Specify maximum day of month depending on month and leap year
   max_day = 31
@@ -113,3 +117,12 @@ def select_datetime(prompt):
 
   tz = get_localzone()
   return tz.localize(datetime(year, month, day, hour, minute))
+
+def select_timerange():
+  start_datetime = select_datetime("Selecting start date/time")
+  end_datetime = select_datetime("Selecting end date/time")
+  
+  while end_datetime < start_datetime:
+    print("Select an end date/time that's greater than " + str(start_datetime))
+    end_datetime = select_datetime("Selecting end date/time")
+  return [start_datetime, end_datetime]
