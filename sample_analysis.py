@@ -123,7 +123,21 @@ class Model:
     '''run the iterate function for each sample size in settings.py. Returns 1 if no samples in range for param, 0 if success'''
     #generate Data from the original set of samples'''
     original = self.samples
+
+    nums = range(0, len(self.samples))
+    pv = [float(self.samples[i][self.parameter]) if self.samples[i][self.parameter] != '' else 0 for i in range(len(self.samples))]
+    pv.sort(reverse=True)
+    plt.plot(nums, pv)
+
     self.clean()
+
+    nums = range(0, len(self.samples))
+    pv = [float(self.samples[i]) for i in range(len(self.samples))]
+    pv.sort(reverse=True)
+    plt.plot(nums, pv)
+
+    plt.show()
+
     if self.samples == []:
       return 1
     self.actual = Data(self.samples, calc_sd=True)

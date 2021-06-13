@@ -22,7 +22,6 @@ print(get_time.time_codify(week, t))
 main_menu_options = ["Analyze site", "Site management", "Quit"]
 main_menu = menu.select_element("Main menu", main_menu_options)
 
-
 while main_menu != "Quit":
     if main_menu == "Analyze site":
         sample_analysis.analyze()
