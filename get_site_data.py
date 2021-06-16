@@ -5,6 +5,21 @@ import requests
 import settings
 import menu
 
+def apply_qualifier(qualifier, value, mode):
+  '''Returns val after accounting for qualifier, including multiple cases for <'''
+  if qualifier == "A":  #if ok, just use val
+    return value
+  if qualifier == "e":  #val was edited, don't use
+    return ''
+  if qualifier == "<":  #when val is below min
+    if mode == "v":     #if in v mode, use val
+      return value
+    elif mode == "m":   #if in mean mode, take mean
+      return value / 2
+    elif mode == "0":   #if in 0 mode, use 0
+      return 0
+  
+
 def get_url(site, year):
   '''Returns url for data of site during specified year'''
   url = "http://waterservices.usgs.gov/nwis/iv/?format=json&indent=on&sites="
@@ -15,7 +30,7 @@ def get_url(site, year):
   url += "&endDT=" + str(year + 1) + "-12-31&siteStatus=all"
   return url
   
-def extract_data(site, start_year=settings.earliest_year):
+def extract_data(site, q_mode, start_year=settings.earliest_year):
   '''Writes to file in site_data that contains site data since beginning of start year to present'''
   current_year = datetime.datetime.today().year
   file_location = "site_data/" + str(site) + ".csv"
@@ -45,7 +60,8 @@ def extract_data(site, start_year=settings.earliest_year):
             if dt not in site_dict.keys():
               #Give row correct width
               site_dict[dt] = [None] * len(data)
-            site_dict[dt][header_index] = value["value"]
+            q_val = apply_qualifier(value["qualifiers"][0], value["value"], q_mode)
+            site_dict[dt][header_index] = q_val
     writer = csv.writer(myfile, delimiter=',')
     #Order the rows by their datetimes
     ordered = collections.OrderedDict(sorted(site_dict.items()))

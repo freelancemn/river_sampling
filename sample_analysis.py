@@ -123,20 +123,7 @@ class Model:
     '''run the iterate function for each sample size in settings.py. Returns 1 if no samples in range for param, 0 if success'''
     #generate Data from the original set of samples'''
     original = self.samples
-
-    nums = range(0, len(self.samples))
-    pv = [float(self.samples[i][self.parameter]) if self.samples[i][self.parameter] != '' else 0 for i in range(len(self.samples))]
-    pv.sort(reverse=True)
-    plt.plot(nums, pv)
-
     self.clean()
-
-    nums = range(0, len(self.samples))
-    pv = [float(self.samples[i]) for i in range(len(self.samples))]
-    pv.sort(reverse=True)
-    plt.plot(nums, pv)
-
-    plt.show()
 
     if self.samples == []:
       return 1
@@ -206,6 +193,7 @@ def analyze(iterations=0, time_range=0):
     writer = csv.writer(csvfile) 
 
     for p in range(1, len(data[0])):
+      print("Analyzing " + data[0][p])
       annual_load = load_calculator.calculate_load(data, p)
       #p = len(data[0]) - 1  #just checks final param, delete this later
       
@@ -230,7 +218,7 @@ def analyze(iterations=0, time_range=0):
           save_dest = path_1 + p_name.split(",")[0] + path_2
           Path(save_dest).mkdir(parents=True, exist_ok=True)
 
-        plt.figure(figsize=(10,5))
+        plt.figure(figsize=(10,8))
         for l in range(len(m.val_ls)):   #absolute error bars graph
           plt.errorbar(settings.sample_sizes, m.val_ls[l], yerr=m.abs_ls[l], label=str(settings.p_vals[l]))
         plt.xlabel("Number of subsamples")
@@ -238,8 +226,9 @@ def analyze(iterations=0, time_range=0):
         plt.suptitle(title)
         plt.legend(title='Percentiles', bbox_to_anchor=(1, 1), loc='upper left')
         plt.savefig(save_dest + 'abs.png')
+        plt.close()
 
-        plt.figure(figsize=(10,5))
+        plt.figure(figsize=(10,8))
         for l in range(len(m.val_ls)):   #relative error bars graph
           plt.errorbar(settings.sample_sizes, m.val_ls[l], yerr=m.rel_ls[l], label=str(settings.p_vals[l]))
         plt.xlabel("Number of subsamples")
@@ -249,6 +238,7 @@ def analyze(iterations=0, time_range=0):
         plt.legend(title='Percentiles', bbox_to_anchor=(1, 1), loc='upper left')
         #plt.gca().set_ylim([-100,100])
         plt.savefig(save_dest + 'rel.png')
+        plt.close()
 
         dt_info = [time_range[0].date(), time_range[0].time(), time_range[1].date(), time_range[1].time()]#, (time_range[1].date()-time_range[0].date()).days]
         head = [p, site.split(".")[0], data[0][p]] + dt_info

@@ -24,6 +24,7 @@ def calculate_load(data, p):
                 cur_p_val = float(row[p])
             annual_load += cur_p_val * scalar
     else:
+        cur_discharge_val = 0
         for row in data[1:]:
             if row[p] != '':
                 cur_p_val = float(row[p])
