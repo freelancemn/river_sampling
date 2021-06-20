@@ -10,7 +10,7 @@ abbreviations = {
     "Nitrate plus nitrite, water, in situ, mg/L as N": ["NO3", "Nitrate", "mg per L"],
     "Dissolved organic matter fluorescence (fDOM), water, in situ, concentration estimated from reference material, micrograms per liter as quinine sulfate equivalents (QSE)": ["FDOM", "fDOM", "QSE"],
     "Chlorophyll, total, water, fluorometric, 650-700 nanometers, in situ sensor, micrograms per liter": ["CHLA", "Chlorophyll", "micrograms per liter"],
-    "Phycocyanins (cyanobacteria), water, in situ, in vivo fluorescence, in vivo fluorescence units": ["CYAN", "Phycocyanins (cyanobacteria)", "vivo fluorescence units"]
+    "Phycocyanins (cyanobacteria), water, in situ, in vivo fluorescence, in vivo fluorescence units": ["CYAN", "Cyanobacteria", "vivo fluorescence units"]
 }
 
 def abbreviate(p_name):

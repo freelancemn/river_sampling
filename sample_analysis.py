@@ -219,7 +219,7 @@ def analyze(iterations=0, time_range=0):
           save_dest = path_1 + p_name.split(",")[0] + path_2
           Path(save_dest).mkdir(parents=True, exist_ok=True)
 
-        plt.figure(figsize=(10,5))
+        plt.figure(figsize=(10,6))
         for l in range(len(m.val_ls)):   #absolute error bars graph
           plt.errorbar(settings.sample_sizes, m.val_ls[l], yerr=m.abs_ls[l], label=str(settings.p_vals[l]))
         plt.xlabel("Number of subsamples")
@@ -229,7 +229,7 @@ def analyze(iterations=0, time_range=0):
         plt.savefig(save_dest + 'abs.png')
         plt.close()
 
-        plt.figure(figsize=(10,5))
+        plt.figure(figsize=(10,6))
         for l in range(len(m.val_ls)):   #relative error bars graph
           plt.errorbar(settings.sample_sizes, m.val_ls[l], yerr=m.rel_ls[l], label=str(settings.p_vals[l]))
         plt.xlabel("Number of subsamples")
