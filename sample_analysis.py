@@ -1,3 +1,4 @@
+import abbreviations
 import csv
 import datetime
 import get_time
@@ -193,7 +194,8 @@ def analyze(iterations=0, time_range=0):
     writer = csv.writer(csvfile) 
 
     for p in range(1, len(data[0])):
-      print("Analyzing " + data[0][p])
+      p_name = abbreviations.shorten(data[0][p])
+      print("Analyzing " + p_name)
       annual_load = load_calculator.calculate_load(data, p)
       #p = len(data[0]) - 1  #just checks final param, delete this later
       
@@ -204,21 +206,20 @@ def analyze(iterations=0, time_range=0):
         print ("No samples were found in this timerange for", data[0][p])
       else:
         site_name = ''.join(site.split(".")[:-1])    #remove .csv text
-        p_name = data[0][p]
         path_1 = 'maap_graphs/' + site_name + '/' 
         
         title = str(time_range[0]) + " through " + str(time_range[1])
         title += " " + str(iterations) + " iterations"
         path_2 = '/' + title.replace(":", " ").replace(".", "d") + '/'
         
-        save_dest = path_1 + p_name.replace(":", " ").replace(".", "d") + path_2
+        save_dest = path_1 + p_name + path_2
         try:
           Path(save_dest).mkdir(parents=True, exist_ok=True)
         except:     #strange filenotfounderror from pathlib for some parameters
           save_dest = path_1 + p_name.split(",")[0] + path_2
           Path(save_dest).mkdir(parents=True, exist_ok=True)
 
-        plt.figure(figsize=(10,8))
+        plt.figure(figsize=(10,5))
         for l in range(len(m.val_ls)):   #absolute error bars graph
           plt.errorbar(settings.sample_sizes, m.val_ls[l], yerr=m.abs_ls[l], label=str(settings.p_vals[l]))
         plt.xlabel("Number of subsamples")
@@ -228,7 +229,7 @@ def analyze(iterations=0, time_range=0):
         plt.savefig(save_dest + 'abs.png')
         plt.close()
 
-        plt.figure(figsize=(10,8))
+        plt.figure(figsize=(10,5))
         for l in range(len(m.val_ls)):   #relative error bars graph
           plt.errorbar(settings.sample_sizes, m.val_ls[l], yerr=m.rel_ls[l], label=str(settings.p_vals[l]))
         plt.xlabel("Number of subsamples")
