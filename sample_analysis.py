@@ -189,7 +189,7 @@ def analyze(iterations=0, time_range=0):
   data = data_in_time_range("site_data/"+site, time_range)
 
   #write all of the maap data to the summary.csv file
-  with open("model_summaries.csv", "a", newline='') as csvfile:
+  with open("summaries/model_summaries.csv", "a", newline='') as csvfile:
     writer = csv.writer(csvfile) 
 
     for p in range(1, len(data[0])):
@@ -253,7 +253,7 @@ def analyze(iterations=0, time_range=0):
           head_e = head + ["INSERT SAMPLING STRATEGY", iterations, settings.sample_sizes[s], "perc culled", np.mean(m.val_m), np.std(m.val_m)]
           writer.writerow(head_e + val_ls_t[s] + [np.mean(m.abs_m), np.std(m.abs_m)] + abs_ls_t[s] + [np.mean(m.rel_m), np.std(m.rel_m)] + rel_ls_t[s] + abs_sd_t[s] + rel_sd_t[s])
 
-        with open("site_summaries.csv", "a", newline='') as f:
+        with open("summaries/site_summaries.csv", "a", newline='') as f:
           w = csv.writer(f)
 
           observation_section = [m.potential_observations, m.actual_observations, m.potential_observations - m.actual_observations]

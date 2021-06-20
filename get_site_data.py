@@ -9,7 +9,7 @@ def apply_qualifier(qualifier, value, mode):
   '''Returns val after accounting for qualifier, including multiple cases for <'''
   if qualifier == "A":  #if ok, just use val
     return value
-  if qualifier == "e":  #val was edited, don't use
+  if qualifier == "e" or "X":  #val was estimated, don't use
     return ''
   if qualifier == "<":  #when val is below min
     if mode == "v":     #if in v mode, use val
@@ -18,6 +18,8 @@ def apply_qualifier(qualifier, value, mode):
       return value / 2
     elif mode == "0":   #if in 0 mode, use 0
       return 0
+  else:
+    return value        #base case
   
 
 def get_url(site, year):
