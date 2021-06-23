@@ -32,10 +32,10 @@ def get_url(site, year):
   url += "&endDT=" + str(year + 1) + "-12-31&siteStatus=all"
   return url
   
-def extract_data(site, q_mode, start_year=settings.earliest_year):
+def extract_data(site, q_mode, start_year=settings.earliest_year, auto_warning = ""):
   '''Writes to file in site_data that contains site data since beginning of start year to present'''
   current_year = datetime.datetime.today().year
-  file_location = "site_data/" + str(site) + ".csv"
+  file_location = "site_data/" + str(site) + auto_warning + ".csv"
   open(file_location, 'w').close()  #clear the current file
   site_dict = {}
   dict_variables = []
