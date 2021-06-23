@@ -222,7 +222,7 @@ def analyze(iterations=0, time_range=0):
         plt.figure(figsize=(10,6))
         for l in range(len(m.val_ls)):   #absolute error bars graph
           plt.errorbar(settings.sample_sizes, m.val_ls[l], yerr=m.abs_ls[l], label=str(settings.p_vals[l]))
-        plt.xlabel("Number of subsamples")
+        plt.xlabel("Sample size")
         plt.ylabel(p_name + ", absolute error bars")
         plt.suptitle(title)
         plt.legend(title='Percentiles', bbox_to_anchor=(1, 1), loc='upper left')
@@ -232,12 +232,11 @@ def analyze(iterations=0, time_range=0):
         plt.figure(figsize=(10,6))
         for l in range(len(m.val_ls)):   #relative error bars graph
           plt.errorbar(settings.sample_sizes, m.val_ls[l], yerr=m.rel_ls[l], label=str(settings.p_vals[l]))
-        plt.xlabel("Number of subsamples")
+        plt.xlabel("Sample size")
         plt.ylabel(p_name + ", relative error bars")
         plt.suptitle(title)
         plt.legend(loc="upper right")
         plt.legend(title='Percentiles', bbox_to_anchor=(1, 1), loc='upper left')
-        #plt.gca().set_ylim([-100,100])
         plt.savefig(save_dest + 'rel.png')
         plt.close()
 

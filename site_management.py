@@ -22,7 +22,7 @@ def add_site():
   site = menu.select_integer("site number", 0, 0, False)
 
   q_prompt = "How should values known to be less than the reported value be handled?"
-  q_options = ["v: use min val", "m: use mean (half of min val)", "0: use 0"]
+  q_options = ["v: use minimum reporting value", "m: use mean (half of minimum reporting value)", "0: use 0"]
   q_mode = menu.select_element(q_prompt, q_options)[0]
 
   with open("auto_sites.txt", "r") as file:
