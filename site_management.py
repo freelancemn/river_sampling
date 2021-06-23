@@ -31,7 +31,9 @@ def add_site():
       if site == line.rstrip():
         get_site_data.extract_data(site, q_mode, settings.earliest_year)
         return
-  print("Site number wasn't found in list of automatic sites")
+  #site was not in the list of auto sites, will attempt to add site and mark filename as 'not auto'
+  print("Site number wasn't found in list of automatic sites, will mark site file as 'not auto'")
+  get_site_data.extract_data(site, q_mode, settings.earliest_year)
 
 def remove_site():
   '''Remove a site from site_data'''
