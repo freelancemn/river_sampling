@@ -1,6 +1,17 @@
+def streamflow_index(header):
+    '''returns index of streamflow parameter from header row of site data'''
+    streamflow_aliases = ["Streamflow, ft&#179;/s", "Streamflow, ft^3/s"]
+    
+    for alias in streamflow_aliases:
+        if alias in header:
+            return header.index(alias)
+    
+    #if a streamflow column was not found...
+    raise ValueError("Could not locate streamflow parameter in site data")
+
 def calculate_load(data, p):
     p_name = data[0][p]
-    discharge_index = data[0].index("Streamflow, ft&#179;/s") #don't know if all sites use this name, need abrev. table
+    discharge_index = streamflow_index(data[0])
     scalar = 900
     is_discharge = False
     annual_load = 0
