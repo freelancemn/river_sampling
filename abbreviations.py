@@ -13,14 +13,22 @@ abbreviations = {
     "Phycocyanins (cyanobacteria), water, in situ, in vivo fluorescence, in vivo fluorescence units": ["CYAN", "Cyanobacteria", "vivo fluorescence units"]
 }
 
+def remove_bad_path_chars(s):
+    '''removes characters that mess up windows path'''
+    bad_path_chars = '\/:*?"<>|'
+
+    for c in bad_path_chars:
+        s = s.replace(c, "")
+    return s
+
 def abbreviate(p_name):
     '''returns an abbreviation of a parameter name that is <= 4 characters, or the original name if none exists'''
     if p_name not in abbreviations.keys():
-        return p_name
+        return remove_bad_path_chars(p_name)
     return abbreviations[p_name][0]
 
 def shorten(p_name):
     '''returns a shortened version of a parameter name with its units, or the original name if none exists'''
     if p_name not in abbreviations.keys():
-        return p_name
+        return remove_bad_path_chars(p_name)
     return abbreviations[p_name][1] + ", " + abbreviations[p_name][2]
