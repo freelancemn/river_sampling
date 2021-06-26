@@ -1,5 +1,4 @@
 import csv
-from os import listdir
 import sample_analysis
 import random
 import get_time
@@ -29,7 +28,7 @@ def remove_date(samples, date):
 
 
 all_samples = []
-site = menu.select_element("site", listdir("site_data") + ["Exit"])
+site = menu.select_site()
 dt = get_time.select_datetime("start year", just_year=True)
 num_yrs = menu.select_integer("number of years")
 samples_per_yr = menu.select_integer("number of samples per year")

@@ -213,11 +213,12 @@ def analyze(iterations=0, time_range=0):
         path_2 = '/' + title.replace(":", " ").replace(".", "d") + '/'
         
         save_dest = path_1 + p_name + path_2
-        try:
+        '''try:
           Path(save_dest).mkdir(parents=True, exist_ok=True)
         except:     #strange filenotfounderror from pathlib for some parameters
           save_dest = path_1 + p_name.split(",")[0] + path_2
-          Path(save_dest).mkdir(parents=True, exist_ok=True)
+          Path(save_dest).mkdir(parents=True, exist_ok=True)'''
+        Path(save_dest).mkdir(parents=True, exist_ok=True)
 
         plt.figure(figsize=(10,6))
         for l in range(len(m.val_ls)):   #absolute error bars graph

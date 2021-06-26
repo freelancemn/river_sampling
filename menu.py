@@ -1,3 +1,5 @@
+from os import listdir
+
 def assert_integer(i):
   '''returns true if string represents an integer'''
   try:
@@ -56,3 +58,7 @@ def select_integer(name, lower=0, upper=0, as_int = True):
   if as_int:
     return int(choice)
   return choice
+
+def select_site():
+  '''User chooses from sites held in site_data folder'''
+  return select_element("site", listdir("site_data") + ["Exit"])

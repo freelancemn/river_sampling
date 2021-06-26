@@ -1,5 +1,6 @@
 import get_auto_sites
 import get_site_data
+import load_calculator
 import sample_analysis
 import site_management
 import settings
@@ -19,7 +20,7 @@ t = get_time.range_time()
 print(get_time.time_codify(week, t))
 
 '''
-main_menu_options = ["Analyze site", "Site management", "Quit"]
+main_menu_options = ["Analyze site", "Site management", "Discharge record", "Quit"]
 main_menu = menu.select_element("Main menu", main_menu_options)
 
 while main_menu != "Quit":
@@ -27,4 +28,6 @@ while main_menu != "Quit":
         sample_analysis.analyze()
     elif main_menu == "Site management":
         site_management.interface()
+    elif main_menu == "Discharge record":
+        load_calculator.discharge_record()
     main_menu = menu.select_element("Main menu", main_menu_options)
