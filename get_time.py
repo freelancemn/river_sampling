@@ -74,21 +74,25 @@ def codify(weekdays, time_range):
 
   return str(week) + str(time_start) + str(time_end)
 
-def select_datetime(prompt):
+def select_datetime(prompt, just_year = False):
   '''Ask user to select date between settings.earliest year and now'''
   print(prompt)
   now = datetime.now()
+  tz = get_localzone()
   months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December", "Start of year"]
-  
+
   #If current year is chosen, make maximum month the current month
   year = menu.select_integer("Year", settings.earliest_year, now.year)
+  
+  if just_year:
+    return tz.localize(datetime(year, 1, 1, 0, 0))
+  
   max_month = 12
   if year == now.year:
     max_month = now.month
   month = menu.select_element("Month", months, True)
   
   if (month > max_month):
-    tz = get_localzone()
     return tz.localize(datetime(year, 1, 1, 0, 0))
   
   #Specify maximum day of month depending on month and leap year
@@ -115,7 +119,6 @@ def select_datetime(prompt):
   minute_options[0] += "0"
   minute = (menu.select_element("Minute", minute_options, True)-1) * 15
 
-  tz = get_localzone()
   return tz.localize(datetime(year, month, day, hour, minute))
 
 def select_timerange():
