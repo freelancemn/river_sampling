@@ -30,6 +30,8 @@ def make_sparse_dataset():
     '''User defines site/range/samples_per_yr, random subset, one sample per day'''
     all_samples = []
     site = menu.select_site("superset")
+    if site == "Exit":
+        return
     dt = get_time.select_datetime("start year", just_year=True)
     num_yrs = menu.select_integer("number of years")
     samples_per_yr = menu.select_integer("number of samples per year")

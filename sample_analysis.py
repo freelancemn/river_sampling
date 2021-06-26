@@ -178,7 +178,7 @@ def analyze(iterations=0, time_range=0):
   '''run the generate_maap function for each parameter in a site's data'''
   
   #allow the user to select the site, number of iterations, and time_range
-  site = menu.select_element("site", listdir("site_data") + ["Exit"])
+  site = menu.select_site()
   if site == "Exit":
     return
     

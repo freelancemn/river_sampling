@@ -15,6 +15,8 @@ def streamflow_index(header):
 def discharge_record():
     '''Creates file in discharge_records folder containing datetimes and streamflow'''
     site = menu.select_site()
+    if site == "Exit":
+        return
     data = []
     i_name = ""
     
