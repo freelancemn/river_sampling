@@ -44,11 +44,11 @@ for y in range(0, num_yrs):
     print("Collecting samples from " + str(years[0].year))
 
     while (len(samples) < samples_per_yr):
-        if len(yearly_data) == 0:
+        if len(yearly_data) == 1:   #if only the header is left
             print("Not enough valid samples in year " + str(years[0].year))
             print("Will use " + str(len(samples)) + " samples for this year")
             break
-        s = random.choice(yearly_data)
+        s = random.choice(yearly_data[1:])
         if s[p_index] == '':            #if param of interest is empty, remove sample
             yearly_data.remove(s)
         else:
