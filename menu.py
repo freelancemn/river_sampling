@@ -59,6 +59,6 @@ def select_integer(name, lower=0, upper=0, as_int = True):
     return int(choice)
   return choice
 
-def select_site():
+def select_site(message = "site"):
   '''User chooses from sites held in site_data folder'''
-  return select_element("site", listdir("site_data") + ["Exit"])
+  return select_element(message, listdir("site_data") + ["Exit"])
