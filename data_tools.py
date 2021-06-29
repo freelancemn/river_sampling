@@ -1,5 +1,7 @@
 import csv
 import datetime
+import get_time
+import menu
 import numpy as np
 import settings
 
@@ -41,3 +43,15 @@ def data_in_time_range(file_location, time_range):
 def transpose(m):
   '''returns transpose of 2d list'''
   return [[m[j][i] for j in range(len(m))] for i in range(len(m[0]))]
+
+class Analysis_Params():
+  '''set of parameters for running sample_analysis'''
+  def __init__(self):
+    #select a site
+    self.site = menu.select_site()
+    if self.site == "Exit":
+      raise ValueError('Exit chosen. Stopping sample analysis')
+      
+    #select num of iterations and time range
+    self.iterations = menu.select_integer("Number of iterations")
+    self.time_range = get_time.select_timerange()
