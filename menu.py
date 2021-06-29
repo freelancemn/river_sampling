@@ -62,3 +62,26 @@ def select_integer(name, lower=0, upper=0, as_int = True):
 def select_site(message = "site"):
   '''User chooses from sites held in site_data folder'''
   return select_element(message, listdir("site_data") + ["Exit"])
+
+def multiselect(ls, name = "option"):
+  '''binary select multiple options from list of strings'''
+  #start off with all unselected
+  choices = [False for x in range(len(ls) + 3)]
+  #3 extra spaces: select all, unselect all, continue respectively
+
+  while (not choices[-1]):  #while continue isn't selected
+    options = ["[" + ("Y" if choices[x] else "N") + "] " + ls[x] for x in range(len(ls))]
+    options += ["Select all", "Unselect all", "Continue"]
+    
+    choice = select_element(name, options, return_int=True) - 1 #make 0 indexed
+    
+    if choice == len(options) - 3:  #select all case
+      choices = [True for x in range(len(options))]
+      choices[-1] = False   #keep the continue choice the same
+    elif choice == len(options) - 2:  #unselect all case
+      choices = [False for x in range(len(options))]
+    else:
+      #flip bool value at chosen index in options
+      choices[choice] = not choices[choice]
+  
+  return choices[:-3]   #return choices (aside from select/continue)
