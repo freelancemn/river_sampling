@@ -5,14 +5,6 @@ import get_time
 import menu
 from operator import itemgetter
 
-#run this function to specify/generate sparse_dataset.csv
-
-'''def date_is_unique(samples, date):
-    for s in samples:
-        if date == s[0]:
-            return False
-    return True'''
-
 def date_from_datetime_str(dt):
     '''returns date string from datetime string'''
     return dt.split("T")[0]
