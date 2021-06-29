@@ -21,8 +21,6 @@ t = get_time.range_time()
 print(get_time.time_codify(week, t))
 
 '''
-pizzas = ["cheese", "meaty", "veggie", "fishy"]
-print(menu.multiselect(pizzas))
 
 main_menu_options = ["Analyze site", "Site management", "Discharge record maker"]
 main_menu_options += ["Sparse dataset maker", "Quit"]

@@ -31,13 +31,16 @@ def discharge_record():
         for row in csvreader: 
             data.append([row[0], row[i]])
 
-    with open("discharge_records/" + site, 'w', newline="") as csvfile: 
+    site = site.split(".")[0]   #remove type extension
+    filepath = "discharge_records/" + site + "_discharge.csv"
+    with open(filepath, 'w', newline="") as csvfile: 
         w = csv.writer(csvfile)
         #this file only has Datetimes and streamflows/discharges
         w.writerow(["Datetimes", i_name])
 
         for d in data[1:]:
             w.writerow(d)
+    print("Complete. File can be located at " + filepath)
 
 def calculate_load(data, p):
     '''Calculates load of given parameter from data'''

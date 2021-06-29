@@ -21,7 +21,7 @@ def in_bounds(n, lower, upper):
       return False
   return True
 
-def select_element(name, l, as_int=False, single=True):
+def select_element(name, l, return_index=False, single=True):
   '''select element from list, or elements separated by spaces'''
   choice = ""
   single_msg = "" if single else "(May enter multiple ints separated by spaces)\n"
@@ -41,7 +41,7 @@ def select_element(name, l, as_int=False, single=True):
 
   print()
   #If returning integer instead of element, use 0 index
-  if as_int:
+  if return_index:
     return choice[0] if single else choice
   return l[choice[0] - 1] if single else [l[x - 1] for x in choice]
 
@@ -63,9 +63,12 @@ def select_integer(name, lower=0, upper=0, as_int=True):
     return int(choice[0])
   return choice[0]
 
-def select_site(message = "site"):
+def select_site(message = "site", single=True):
   '''User chooses from sites held in site_data folder'''
-  return select_element(message, listdir("site_data") + ["Exit"])
+  if single:
+    return select_element(message, listdir("site_data") + ["Exit"])
+  else:
+    return multiselect(listdir("site_data"), message)
 
 def multiselect(ls, name = "option"):
   '''binary select multiple options from list of strings'''
@@ -77,7 +80,7 @@ def multiselect(ls, name = "option"):
     options = ["[" + ("Y" if choices[x] else "N") + "] " + ls[x] for x in range(len(ls))]
     options += ["Select all", "Unselect all", "Continue"]
     
-    choice = select_element(name, options, as_int=True, single=False)
+    choice = select_element(name, options, return_index=True, single=False)
     choice = [x - 1 for x in choice]  #make 0 indexed
 
     for c in choice:  #allow for multiple choices separated by spaces

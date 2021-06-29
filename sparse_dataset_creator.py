@@ -61,10 +61,12 @@ def make_sparse_dataset():
         all_samples.extend(sorted(samples, key=itemgetter(0)))
 
     file_name = site.split(".")[0] + " " + str(dt).split("-")[0] + " " + str(num_yrs)
-    file_name += " " + str(samples_per_yr) + " " + str(p_index) + ".csv"
+    file_name += " " + str(samples_per_yr) + " " + str(p_index) + "_sparse.csv"
+    file_path = "sparse_datasets/" + file_name
 
-    with open("sparse_datasets/" + file_name, "w", newline='') as f:
+    with open(file_path, "w", newline='') as f:
         w = csv.writer(f)
         w.writerow(["Date", header])
         for s in all_samples:
             w.writerow(s)
+    print("Complete. File can be located at " + file_path)
