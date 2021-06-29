@@ -56,7 +56,7 @@ def select_integer(name, lower=0, upper=0, as_int=True):
       message = " between " + str(lower) + " and " + str(upper) + ":\t"
     choice = input("Select " + name + message).split(" ")
 
-    if assert_integer(choice) and in_bounds(int(choice), lower, upper):
+    if assert_integer(choice) and in_bounds(choice, lower, upper):
       break
 
   if as_int:
@@ -68,9 +68,17 @@ def select_site(message = "site", single=True):
   if single:
     return select_element(message, listdir("site_data") + ["Exit"])
   else:
-    return multiselect(listdir("site_data"), message)
+    return multiselect(listdir("site_data"), message, return_names=True)
 
-def multiselect(ls, name = "option"):
+def filter_with_bool_list(ls, choices):
+  '''return elements from filtered list'''
+  r = []
+  for c in range(len(choices[:-3])):
+    if choices[c] == True:
+      r.append(ls[c])
+  return r
+
+def multiselect(ls, name = "option", return_names = False):
   '''binary select multiple options from list of strings'''
   #start off with all unselected
   choices = [False for x in range(len(ls) + 3)]
@@ -93,4 +101,6 @@ def multiselect(ls, name = "option"):
         #flip bool value at chosen index in options
         choices[c] = not choices[c]
   
+  if return_names:
+    return filter_with_bool_list(ls, choices)
   return choices[:-3]   #return choices (aside from select/continue)

@@ -46,11 +46,9 @@ def transpose(m):
 
 class Analysis_Params:
   '''set of parameters for running sample_analysis'''
-  def __init__(self, site_params):
+  def __init__(self):
     #select a site
     self.site = menu.select_site(single=False)
-    if self.site == "Exit":
-      raise ValueError('Exit chosen. Stopping sample analysis')
       
     #select num of iterations and time range
     self.iterations = menu.select_integer("Number of iterations")
