@@ -1,8 +1,7 @@
 import abbreviations
 import csv
-import datetime
+import data_tools
 import get_time
-from os import listdir
 import load_calculator
 import menu
 import numpy as np
@@ -10,26 +9,6 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import random
 import settings
-
-def flatten(l):
-  '''Turn a 2d list into a 1d list'''
-  flat_list = [item for sublist in l for item in sublist]
-  return flat_list
-
-class Data:
-  '''Associates a list of nums with their SD, mean, and percentiles'''
-  def __init__(self, values, calc_sd = False, calc_perc = True, calc_mean = True):
-    self.mean = 0
-    self.percentiles = []
-    self.sd = 0
-
-    #Each calculation is optional to save on computation time
-    if calc_sd == True:
-      self.sd = np.std(values)
-    if calc_mean == True:
-      self.mean = sum(values)/len(values)
-    if calc_perc == True:
-      self.percentiles = np.percentile(values, settings.p_vals)
 
 class Vert:
   '''A vertical line in the MAAP graph, representing the percentile values at a given sample size'''
@@ -81,7 +60,7 @@ class Model:
     s = []
     for _ in range(self.sample_size):
       s.append(random.choice(self.samples))
-    d = Data(s)
+    d = data_tools.Data(s)
     return d
 
   def data_of_transposed_percentiles(self, matrix):
@@ -91,7 +70,7 @@ class Model:
       pv = []         #percentile values
       for d in matrix:
         pv.append(d.percentiles[p])
-      data_at_p.append(Data(pv, calc_sd=True, calc_perc=False))
+      data_at_p.append(data_tools.Data(pv, calc_sd=True, calc_perc=False))
     return data_at_p
 
   def mean_of_data_matrix(self, matrix):
@@ -110,8 +89,8 @@ class Model:
     for _ in range(self.iterations):
       sub = self.subset()
       model_vals.append(sub)
-      absolute_diffs.append(Data([a - m for a, m in zip(actual.percentiles, sub.percentiles)])) #diffs between subset percentiles and actual percentiles
-      relative_diffs.append(Data([100/a * (a - m) for a, m in zip(actual.percentiles, sub.percentiles)]))
+      absolute_diffs.append(data_tools.Data([a - m for a, m in zip(actual.percentiles, sub.percentiles)])) #diffs between subset percentiles and actual percentiles
+      relative_diffs.append(data_tools.Data([100/a * (a - m) for a, m in zip(actual.percentiles, sub.percentiles)]))
 
     self.val_m = self.mean_of_data_matrix(model_vals)
     self.abs_m = self.mean_of_data_matrix(absolute_diffs)
@@ -128,7 +107,7 @@ class Model:
 
     if self.samples == []:
       return 1
-    self.actual = Data(self.samples, calc_sd=True)
+    self.actual = data_tools.Data(self.samples, calc_sd=True)
 
     #prepare the culled sample space, record how many samples were lost during culling
     self.samples = original
@@ -155,25 +134,6 @@ class Model:
     #return head + flatten(val_ls) + flatten(abs_ls) + flatten(rel_ls)
     return 0
 
-def data_in_time_range(file_location, time_range):
-  '''returns data from file that is restrained to a time_range'''
-  with open(file_location, 'r') as csvfile: 
-    csvreader = csv.reader(csvfile) 
-    data = []
-    data.append(next(csvreader))
-
-    #the datetime info is in the first column
-    for row in csvreader: 
-      dt = datetime.datetime.fromisoformat(row[0])
-      if dt < time_range[1] and dt > time_range[0]:    #only use data within the timerange
-        data.append(row)
-  
-    return data 
-
-def transpose(m):
-  '''returns transpose of 2d list'''
-  return [[m[j][i] for j in range(len(m))] for i in range(len(m[0]))]
-
 def analyze(iterations=0, time_range=0):
   '''run the generate_maap function for each parameter in a site's data'''
   
@@ -187,7 +147,7 @@ def analyze(iterations=0, time_range=0):
   if time_range == 0:
     time_range = get_time.select_timerange()
 
-  data = data_in_time_range("site_data/"+site, time_range)
+  data = data_tools.data_in_time_range("site_data/"+site, time_range)
 
   #write all of the maap data to the summary.csv file
   with open("summaries/model_summaries.csv", "a", newline='') as csvfile:
@@ -244,11 +204,11 @@ def analyze(iterations=0, time_range=0):
         dt_info = [time_range[0].date(), time_range[0].time(), time_range[1].date(), time_range[1].time()]#, (time_range[1].date()-time_range[0].date()).days]
         head = [p, site.split(".")[0], data[0][p]] + dt_info
 
-        val_ls_t = transpose(m.val_ls)
-        abs_ls_t = transpose(m.abs_ls)
-        rel_ls_t = transpose(m.rel_ls)
-        abs_sd_t = transpose(m.abs_sd)
-        rel_sd_t = transpose(m.rel_sd)
+        val_ls_t = data_tools.transpose(m.val_ls)
+        abs_ls_t = data_tools.transpose(m.abs_ls)
+        rel_ls_t = data_tools.transpose(m.rel_ls)
+        abs_sd_t = data_tools.transpose(m.abs_sd)
+        rel_sd_t = data_tools.transpose(m.rel_sd)
         
         for s in range(len(settings.sample_sizes)):
           head_e = head + ["INSERT SAMPLING STRATEGY", iterations, settings.sample_sizes[s], "perc culled", np.mean(m.val_m), np.std(m.val_m)]
