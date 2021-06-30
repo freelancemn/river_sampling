@@ -1,47 +1,14 @@
 import menu
 from datetime import datetime
-import pytz
 from tzlocal import get_localzone
-import time
 import settings
 
-def update_week(week, week_choices):
-  '''Update array of selected weeks'''
-  #Options for menu
-  week_map = week[:] + ["Remove all", "Add all", "Next"]
+def get_weekdays():
+  '''returns list of bools for selected weekdays, 0 is Monday'''
+  weekdays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+  return menu.multiselect(weekdays, "day of week")
 
-  #Negate selected status of selected day
-  for day in range(len(week)):
-    if week_choices[day]:
-      week_map[day] = "Remove " + week[day]
-    else:
-      week_map[day] = "Add " + week[day]
-      
-  return week_map
-
-def range_week():
-  '''Input combination of days of the week'''
-  week = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
-  #Initialize all days of week to be selected
-  week_choices = [1] * len(week)
-  week_map = update_week(week, week_choices)
-
-  #Select weekday to add or remove
-  choice = menu.select_element("day", week_map, True)
-
-  while choice != len(week_map): #if "Next" not chosen, keep asking
-    if choice < len(week_map) - 2:  #if a day of week was chosen
-      week_choices[choice - 1] = not week_choices[choice - 1]
-    elif choice == len(week_map) - 2: #if remove all
-      week_choices = [0] * len(week)
-    else: #if add all
-      week_choices = [1] * len(week)
-    week_map = update_week(week, week_choices)
-    choice = menu.select_element("day", week_map, True)
-
-  return week_choices
-
-def range_time():
+def time_range():
   '''Input a range of hours defined by a start and end hour'''
   start = menu.select_integer("starting hour (inclusive)", 0, 23)
   end = 0
@@ -52,8 +19,9 @@ def range_time():
 
 def in_range(dt, weekdays, time_range):
   '''Returns true if datetime falls in temporal range'''
-  if weekdays[dt.weekday()] == True:
-    if dt.hour >= time_range[0] and dt.hour < time_range[1]:
+  dt_object = datetime.fromisoformat(dt)
+  if weekdays[dt_object.weekday()] == True:
+    if dt_object.hour >= time_range[0] and dt_object.hour < time_range[1]:
       return True
 
 def codify(weekdays, time_range):

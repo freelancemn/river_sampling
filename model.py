@@ -109,6 +109,10 @@ class Model:
     num_culled -= len(self.samples)
     self.clean()
 
+    if self.samples == []:
+      print("No samples left after culling")
+      return 1
+
     #commence the iterating
     for sn in settings.sample_sizes:
       self.sample_size = sn

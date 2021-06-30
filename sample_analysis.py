@@ -2,10 +2,10 @@ import abbreviations
 import csv
 import data_tools
 import load_calculator
-import model
 import numpy as np
 from pathlib import Path
 import matplotlib.pyplot as plt
+import sampling_strategies
 import settings
 
 def analyze():
@@ -43,10 +43,10 @@ def write_analysis(p, ap, site, data, m):
     w.writerow(r)
 
 def calculate_analysis(p, ap, site, data):
+  m = ap.strategy(data[1:], ap.iterations, p)
   p_name = abbreviations.shorten(data[0][p])
   print("Analyzing " + p_name)
   
-  m = model.Model(data[1:], ap.iterations, p)
   empty_check = m.generate_maap()
 
   if empty_check == True:
@@ -98,9 +98,12 @@ def analyze_setup(analysis_params = 0):
     data = data_tools.data_in_time_range("site_data/"+site, ap.time_range)
 
     if choose_site_params:
-      site_params = ap.choose_site_params(data[0])
+      ap.choose_site_params(data[0])
       choose_site_params = False
+    
+    print("~Analyzing " + site + "~\n")
 
-    for p in range(len(site_params)):
-      if site_params[p] == True:
-        calculate_analysis(p+1, ap, site, data)  #account for datetime column
+    for p in ap.site_params:
+      header = data[0]
+      if p in header:
+        calculate_analysis(header.index(p), ap, site, data)  #account for datetime column

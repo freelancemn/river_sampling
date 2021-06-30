@@ -3,6 +3,7 @@ import datetime
 import get_time
 import menu
 import numpy as np
+import sampling_strategies
 import settings
 
 def flatten(l):
@@ -57,7 +58,9 @@ class Analysis_Params:
     self.iterations = menu.select_integer("Number of iterations")
     self.time_range = get_time.select_timerange()
     self.site_params = []
+    self.strategy = 0
     
   def choose_site_params(self, headers):
-    self.site_params = menu.multiselect(headers[1:], "parameter")
+    self.site_params = menu.multiselect(headers[1:], "parameter", return_names=True)
+    self.strategy = sampling_strategies.choose_model()
     return self.site_params
