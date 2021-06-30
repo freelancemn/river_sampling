@@ -25,12 +25,15 @@ class Data:
     if calc_perc == True:
       self.percentiles = np.percentile(values, settings.p_vals)
 
-def data_in_time_range(file_location, time_range):
+def data_in_time_range(file_location, time_range=0, just_headers=False):
   '''returns data from file that is restrained to a time_range'''
   with open(file_location, 'r') as csvfile: 
     csvreader = csv.reader(csvfile) 
     data = []
     data.append(next(csvreader))
+
+    if just_headers:
+      return data[0]
 
     #the datetime info is in the first column
     for row in csvreader: 
