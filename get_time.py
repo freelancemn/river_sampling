@@ -74,29 +74,40 @@ def codify(weekdays, time_range):
 
   return str(week) + str(time_start) + str(time_end)
 
+def choose_month(year):
+  '''(Returns date, whether special), user chooses month or special date, must not be in future'''
+  months = ["January", "February", "March", "April", "May", "June", "July"]
+  months += ["August", "September", "October", "November", "December"]
+
+  month_dict = {months[m-1]:datetime(year, m, 1) for m in range(1, len(months)+1)}
+  month_dict["Start of year"] = datetime(year, 1, 1)
+  month_dict["End of water year"] = datetime(year, 9, 30)
+  month_dict["Start of water year"] = datetime(year, 10, 1)
+  month_dict["End of year"] = datetime(year, 12, 31)
+  
+  cur_dt = datetime.today()   #only present option if it's not in future
+  options = [m for (m,d) in month_dict.items() if cur_dt > d]
+  choice = menu.select_element("month", options)
+  return (month_dict[choice], (True if choice not in months else False))
+
 def select_datetime(prompt, just_year = False):
   '''Ask user to select date between settings.earliest year and now'''
   print(prompt)
   now = datetime.now()
   tz = get_localzone()
-  months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December", "Start of year"]
 
   #If current year is chosen, make maximum month the current month
   year = menu.select_integer("Year", settings.earliest_year, now.year)
-  
   if just_year:
     return tz.localize(datetime(year, 1, 1, 0, 0))
   
-  max_month = 12
-  if year == now.year:
-    max_month = now.month
-  month = menu.select_element("Month", months, True)
-  
-  if (month > max_month):
-    return tz.localize(datetime(year, 1, 1, 0, 0))
+  (month_year, is_special) = choose_month(year)
+  if is_special:  #skip choosing day/time if special date is chosen
+    return tz.localize(month_year)
   
   #Specify maximum day of month depending on month and leap year
   max_day = 31
+  month = month_year.month
   if month in [4,6,9,11]:
     max_day = 30
   if month == 2:

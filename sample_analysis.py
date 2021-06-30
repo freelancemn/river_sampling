@@ -13,7 +13,7 @@ def analyze():
   try:
     analyze_setup()
   except PermissionError:
-    print("Permission error.")
+    print("Permission error. Analysis aborted")
     print("Site and model summary files must be closed in other applications")
 
 def write_analysis(p, ap, site, data, m):
