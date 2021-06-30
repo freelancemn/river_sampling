@@ -10,7 +10,11 @@ import settings
 
 def analyze():
   '''generate maap graph for site(s)'''
-  analyze_setup()
+  try:
+    analyze_setup()
+  except PermissionError:
+    print("Permission error.")
+    print("Site and model summary files must be closed in other applications")
 
 def write_analysis(p, ap, site, data, m):
   '''write data to the summaries files'''
