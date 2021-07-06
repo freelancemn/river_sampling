@@ -10,7 +10,9 @@ class Sparse_Params:
     self.site = menu.select_site("superset")
     self.dt = get_time.select_datetime("start year", just_year=True)
     self.num_yrs = menu.select_integer("number of years")
-    self.exact_t = get_time.get_specific_time()
+    self.exact_t = False
+    if not menu.select_element("Use specific time of day?", ["y","n"], True) - 1:
+      self.exact_t = get_time.get_specific_time()
     self.samples_per_yr = menu.select_integer("number of samples per year")
     headers = data_tools.data_in_time_range("site_data/" + self.site, just_headers=True)
     self.p_index = menu.select_element("parameter", headers[1:], return_index=True)
@@ -32,7 +34,8 @@ def remove_date(samples, date):
 def fill_year(sp, years):
   '''get specified num samples from year, or max if less than samples_per_yr'''
   yearly_data = data_tools.data_in_time_range("site_data/" + sp.site, years)
-  yearly_data = get_time.filter_time(yearly_data, sp.exact_t)
+  if sp.exact_t:
+    yearly_data = get_time.filter_time(yearly_data, sp.exact_t)
   samples = []
   while (len(samples) < sp.samples_per_yr):
     if len(yearly_data) == 1:   #if only the header is left

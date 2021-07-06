@@ -34,9 +34,11 @@ def discharge_record():
 	if site == "Exit":
 		return
 	
-	specific_time = get_time.get_specific_time()
+	specific_time = None
+	if not menu.select_element("Use specific time of day?", ["y","n"], True) - 1:
+		specific_time = get_time.get_specific_time()
 	empty_date_msg = "whether to fill empty days with 0 (for EGRET compatibility)"
-	empty_date_fill = menu.select_element(empty_date_msg, ["Yes", "No"])
+	empty_date_fill = menu.select_element(empty_date_msg, ["y", "n"], True) - 2
 
 	data = []
 	i_name = ""

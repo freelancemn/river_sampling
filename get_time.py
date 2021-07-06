@@ -20,7 +20,9 @@ def time_range():
   return (start, end)
 
 def equal_times(t1, t2):
-  '''compares 2 time objects, hour and minute'''
+  '''compares 2 time objects, hour and minute. returns true if either are none'''
+  if t1 == None or t2 == None:
+    return True
   if t1.hour == t2.hour and t1.minute == t2.minute:
     return True
   return False
