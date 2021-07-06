@@ -1,5 +1,6 @@
 import csv
 import datetime
+import get_time
 import menu
 
 def streamflow_index(header):
@@ -33,6 +34,7 @@ def discharge_record():
 	if site == "Exit":
 		return
 	
+	specific_time = get_time.get_specific_time()
 	empty_date_msg = "whether to fill empty days with 0 (for EGRET compatibility)"
 	empty_date_fill = menu.select_element(empty_date_msg, ["Yes", "No"])
 
@@ -45,10 +47,11 @@ def discharge_record():
 		#locate streamflow/discharge index in header
 		i = streamflow_index(data[0])
 		i_name = data[0][i]
-
 		#the datetime info is in the first column
 		for row in csvreader:
-			if row[i] != "":	#make sure there's discharge val
+			#make sure there's discharge val\
+			t = datetime.datetime.fromisoformat(row[0]).time()
+			if row[i] != "" and get_time.equal_times(t, specific_time):
 				data.append([row[0], row[i]])
 
 	site = site.split(".")[0]   #remove type extension

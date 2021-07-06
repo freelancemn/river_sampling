@@ -1,5 +1,7 @@
+from data_tools import transpose
 import menu
 from datetime import datetime
+from datetime import time
 from tzlocal import get_localzone
 import settings
 
@@ -17,12 +19,49 @@ def time_range():
     end = menu.select_integer("ending hour (exclusive)", start + 1, 24)
   return (start, end)
 
-def in_range(dt, weekdays, time_range):
+def equal_times(t1, t2):
+  '''compares 2 time objects, hour and minute'''
+  if t1.hour == t2.hour and t1.minute == t2.minute:
+    return True
+  return False
+
+def in_bounds(val, lower, upper):
+  '''returns true if value between min/max'''
+  if val >= lower and val < upper:
+    return True
+  return False
+
+def in_range(dt, weekdays, time_range, with_minute=False):
   '''Returns true if datetime falls in temporal range'''
-  dt_object = datetime.fromisoformat(dt)
+  dt_object = dt
+  if type(dt_object) == str:
+    dt_object = datetime.fromisoformat(dt)
   if weekdays[dt_object.weekday()] == True:
-    if dt_object.hour >= time_range[0] and dt_object.hour < time_range[1]:
+    if in_bounds(dt_object.hour, time_range[0].hour, time_range[1].hour):
+      if with_minute and not in_bounds(dt_object.minute, time_range[0].minute, time_range[1].minute):
+        return False
       return True
+  return False
+
+def get_specific_time():
+  '''returns hour and 15 minute interval'''
+  h = menu.select_integer("hour", 0, 23)
+  minutes = [str(h) + ":" + m for m in ["00", "15", "30", "45"]]
+  m = menu.select_element("minute", minutes, True) - 1
+  return time(h, m*15)
+
+
+def filter_time(data, t1, t2=None):
+  '''keeps row if time == t1 or is between t1 and t2 if t2 provided'''
+  new_data = []
+  for d in data[1:]:
+    t = datetime.fromisoformat(d[0]).time()
+    if t2 == None:
+      if equal_times(t, t1):
+        new_data.append(d)
+    elif in_bounds(t, t1, t2):
+      new_data.append(d)
+  return new_data
 
 def codify(weekdays, time_range):
   '''Converts sampling strategy into unique 7-digit code'''
