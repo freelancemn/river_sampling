@@ -40,8 +40,7 @@ def data_in_time_range(file_location, time_range=0, just_headers=False):
     for row in csvreader: 
       dt = datetime.datetime.fromisoformat(row[0])
       if dt < time_range[1] and dt > time_range[0]:    #only use data within the timerange
-        data.append(row)
-  
+        data.append(row)  
     return data 
 
 def transpose(m):
